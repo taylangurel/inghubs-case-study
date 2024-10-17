@@ -35,7 +35,7 @@ public class AssetServiceTest {
 
         when(assetRepository.findByCustomerId(1L)).thenReturn(Arrays.asList(tryAsset, stockAsset));
 
-        List<Asset> assets = assetService.listAssets(1L);
+        List<Asset> assets = assetService.listAssets();
 
         assertEquals(2, assets.size());
         assertEquals("TRY", assets.get(0).getAssetName());

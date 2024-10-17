@@ -6,7 +6,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,16 +42,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Disable CSRF(Cross-Site Request Forgery) for API endpoints
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
+                // Disable CSRF
+                .csrf(AbstractHttpConfigurer::disable)
 
                 // Permit access to the specified endpoints
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/register").permitAll() // Allow users to register
                         .requestMatchers("/h2-console/**").permitAll() // Allow anyone to access /h2-console
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/customer/**").hasRole("CUSTOMER")
+                        .requestMatchers("/api/**").hasAnyRole("ADMIN", "CUSTOMER")
                         .anyRequest().authenticated()
                 )
+                .httpBasic(httpBasic -> {})
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin) // Allow frames from the same origin, This is necessary because the H2 Console is embedded in an iframe, which Spring Security blocks by default.
                 );

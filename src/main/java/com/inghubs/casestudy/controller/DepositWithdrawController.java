@@ -15,13 +15,13 @@ public class DepositWithdrawController {
     private final DepositWithdrawService depositWithdrawService;
 
     @PostMapping("/deposit")
-    public String depositMoney(@RequestParam Long customerId, @RequestParam Double amount) {
-        return depositWithdrawService.depositMoney(customerId, amount);
+    public String depositMoney(@RequestParam Double amount) {
+        return depositWithdrawService.depositMoney(amount);
     }
 
     @PostMapping("/withdraw")
-    public String withdrawMoney(@RequestParam Long customerId, @RequestParam Double amount, @RequestParam String iban) {
-        return depositWithdrawService.withdrawMoney(customerId, amount, iban);
+    public String withdrawMoney(@RequestParam Double amount) {
+        return depositWithdrawService.withdrawMoney(amount);
     }
 }
 

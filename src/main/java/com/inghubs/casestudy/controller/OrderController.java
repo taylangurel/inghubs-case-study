@@ -20,8 +20,8 @@ public class OrderController {
     }
 
     @GetMapping("/list")
-    public List<Order> listOrders(@RequestParam Long customerId, @RequestParam(required = false) String dateRange) {
-        return orderService.listOrders(customerId, dateRange);
+    public List<Order> listOrders() {
+        return orderService.listOrders();
     }
 
     @DeleteMapping("/delete/{orderId}")

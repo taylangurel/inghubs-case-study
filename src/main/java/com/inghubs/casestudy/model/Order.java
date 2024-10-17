@@ -14,6 +14,7 @@ import java.util.Date;
  */
 
 @Entity
+@Table(name = "customer_order") //Since "order" is a reserved keyword, we change the table name
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

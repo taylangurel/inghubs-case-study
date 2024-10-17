@@ -33,7 +33,7 @@ public class DepositWithdrawServiceTest {
 
         when(assetRepository.findByCustomerId(1L)).thenReturn(Collections.singletonList(tryAsset));
 
-        String result = depositWithdrawService.depositMoney(1L, 500.0);
+        String result = depositWithdrawService.depositMoney(500.0);
 
         assertEquals("Deposit successful", result);
         assertEquals(10500.0, tryAsset.getSize());
@@ -46,7 +46,7 @@ public class DepositWithdrawServiceTest {
 
         when(assetRepository.findByCustomerId(1L)).thenReturn(Collections.singletonList(tryAsset));
 
-        String result = depositWithdrawService.withdrawMoney(1L, 500.0, "TR123456789");
+        String result = depositWithdrawService.withdrawMoney(500.0);
 
         assertEquals("Withdraw successful", result);
         assertEquals(9500.0, tryAsset.getUsableSize());
