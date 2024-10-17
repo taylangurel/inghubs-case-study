@@ -20,10 +20,10 @@ public class DepositWithdrawService {
         // Fetch or create the TRY asset
         Asset tryAsset = assetRepository.findByCustomerId(customerId)
                 .stream()
-                .filter(a -> a.getAssetName().equals("TRY"))
+                .filter(a -> a.getAssetName().equals(Constants.TRY_ASSET_NAME))
                 .findFirst()
                 .orElseGet(() -> {
-                    Asset newTryAsset = new Asset(null, customerId, "TRY", 0.0, 0.0);
+                    Asset newTryAsset = new Asset(null, customerId, Constants.TRY_ASSET_NAME, 0.0, 0.0);
                     assetRepository.save(newTryAsset);
                     return newTryAsset;
                 });
@@ -43,7 +43,7 @@ public class DepositWithdrawService {
         // Fetch the TRY asset or throw an exception if not found
         Asset tryAsset = assetRepository.findByCustomerId(customerId)
                 .stream()
-                .filter(a -> a.getAssetName().equals("TRY"))
+                .filter(a -> a.getAssetName().equals(Constants.TRY_ASSET_NAME))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("TRY asset not found for customer"));
 

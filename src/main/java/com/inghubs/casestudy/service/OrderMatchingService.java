@@ -27,7 +27,7 @@ public class OrderMatchingService {
         for (Order order : pendingOrders) {
             Asset tryAsset = assetRepository.findByCustomerId(order.getCustomerId())
                     .stream()
-                    .filter(a -> a.getAssetName().equals("TRY"))
+                    .filter(a -> a.getAssetName().equals(Constants.TRY_ASSET_NAME))
                     .findFirst()
                     .orElse(null);
 
@@ -66,7 +66,7 @@ public class OrderMatchingService {
 
                     if (tryAsset == null) {
                         // Create a TRY asset if it doesn't exist (shouldn't usually happen)
-                        tryAsset = new Asset(null, order.getCustomerId(), "TRY", order.getSize() * order.getPrice(), order.getSize() * order.getPrice());
+                        tryAsset = new Asset(null, order.getCustomerId(), Constants.TRY_ASSET_NAME, order.getSize() * order.getPrice(), order.getSize() * order.getPrice());
                     } else {
                         tryAsset.setSize(tryAsset.getSize() + order.getSize() * order.getPrice());
                         tryAsset.setUsableSize(tryAsset.getUsableSize() + order.getSize() * order.getPrice());
@@ -78,6 +78,8 @@ public class OrderMatchingService {
                     assetRepository.save(stockAsset);
                     assetRepository.save(tryAsset);
                     orderRepository.save(order);
+                }else {
+                    order.setStatus(OrderStatus.MATCHED);
                 }
             }
         }

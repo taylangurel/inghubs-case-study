@@ -27,31 +27,49 @@ public class OrderService {
         Long customerId = customUserDetailsService.getCurrentUserId();
         order.setCustomerId(customerId);
 
-        // Check if the customer has enough TRY or asset to create the order
-        Asset asset = assetRepository.findByCustomerId(customerId)
+        switch (order.getOrderSide()) {
+
+            case BUY:
+                //with TRY only
+                Asset tryAsset = getAssetOrThrow(
+                        customerId,
+                        Constants.TRY_ASSET_NAME,
+                        order.getSize() * order.getPrice(),
+                        "Not enough TRY to create order");
+
+                tryAsset.setUsableSize(tryAsset.getUsableSize() - order.getSize() * order.getPrice());
+                assetRepository.save(tryAsset);
+                return prepareAndSaveOrder(order);
+
+            case SELL:
+                //Check if the desired asset amount exists
+                Asset asset = getAssetOrThrow(
+                        customerId,
+                        order.getAssetName(),
+                        order.getSize(),
+                        "Not enough " + order.getAssetName() + " to create order");
+
+                asset.setUsableSize(asset.getUsableSize() - order.getSize());
+                assetRepository.save(asset);
+                return prepareAndSaveOrder(order);
+
+            default:
+                throw new IllegalArgumentException("Order Side not supported: " + order.getOrderSide());
+        }
+    }
+
+    private Asset getAssetOrThrow(Long customerId, String assetName, double requiredSize, String errorMessage) {
+        return assetRepository.findByCustomerId(customerId)
                 .stream()
-                .filter(a -> a.getAssetName().equals("TRY")) // ! TRY only
+                .filter(a -> a.getAssetName().equals(assetName))
+                .filter(a -> a.getSize() >= requiredSize)
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Not enough TRY to place an order"));
+                .orElseThrow(() -> new NotFoundException(errorMessage));
+    }
 
-        if (order.getOrderSide().name().equals("BUY") && asset.getUsableSize() < order.getSize() * order.getPrice()) {
-            throw new RuntimeException("Not enough TRY to create order");
-        } else if (order.getOrderSide().name().equals("SELL") && asset.getUsableSize() < order.getSize()) {
-            throw new RuntimeException("Not enough assets to sell");
-        }
-
-        // Update the usable size accordingly
-        if (order.getOrderSide().name().equals("BUY")) {
-            asset.setUsableSize(asset.getUsableSize() - order.getSize() * order.getPrice());
-        } else {
-            asset.setUsableSize(asset.getUsableSize() - order.getSize());
-        }
-
-        assetRepository.save(asset);
-
+    private Order prepareAndSaveOrder(Order order) {
         order.setStatus(OrderStatus.PENDING);
         order.setCreateDate(new Date());
-
         return orderRepository.save(order);
     }
 
@@ -83,7 +101,7 @@ public class OrderService {
         // Update the asset's usable size since the order is being canceled
         Asset asset = assetRepository.findByCustomerId(order.getCustomerId())
                 .stream()
-                .filter(a -> a.getAssetName().equals(order.getAssetName()) || a.getAssetName().equals("TRY"))
+                .filter(a -> a.getAssetName().equals(order.getAssetName()) || a.getAssetName().equals(Constants.TRY_ASSET_NAME))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Asset not found"));
 

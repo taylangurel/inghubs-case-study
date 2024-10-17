@@ -29,7 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
 
-        String role = customer.isAdmin() ? "ROLE_ADMIN" : "ROLE_CUSTOMER";
+        String role = customer.isAdmin() ? Constants.ROLE_ADMIN : Constants.ROLE_CUSTOMER;
 
         return new CustomUser(
                 customer.getUsername(),
