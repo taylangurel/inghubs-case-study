@@ -3,6 +3,7 @@ package com.inghubs.casestudy;
 import com.inghubs.casestudy.model.Asset;
 import com.inghubs.casestudy.repository.AssetRepository;
 import com.inghubs.casestudy.service.AssetService;
+import com.inghubs.casestudy.service.CustomUserDetailsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -20,6 +21,9 @@ public class AssetServiceTest {
     @Mock
     private AssetRepository assetRepository;
 
+    @Mock
+    private CustomUserDetailsService customUserDetailsService;
+
     @InjectMocks
     private AssetService assetService;
 
@@ -34,6 +38,7 @@ public class AssetServiceTest {
         Asset stockAsset = new Asset(1L, 1L, "AAPL", 50.0, 50.0);
 
         when(assetRepository.findByCustomerId(1L)).thenReturn(Arrays.asList(tryAsset, stockAsset));
+        when(customUserDetailsService.getCurrentUserId()).thenReturn(1L);
 
         List<Asset> assets = assetService.listAssets();
 

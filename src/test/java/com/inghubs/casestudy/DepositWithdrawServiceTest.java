@@ -2,6 +2,7 @@ package com.inghubs.casestudy;
 
 import com.inghubs.casestudy.model.Asset;
 import com.inghubs.casestudy.repository.AssetRepository;
+import com.inghubs.casestudy.service.CustomUserDetailsService;
 import com.inghubs.casestudy.service.DepositWithdrawService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,9 @@ public class DepositWithdrawServiceTest {
     @Mock
     private AssetRepository assetRepository;
 
+    @Mock
+    private CustomUserDetailsService customUserDetailsService;
+
     @InjectMocks
     private DepositWithdrawService depositWithdrawService;
 
@@ -32,6 +36,7 @@ public class DepositWithdrawServiceTest {
         Asset tryAsset = new Asset(1L, 1L, "TRY", 10000.0, 10000.0);
 
         when(assetRepository.findByCustomerId(1L)).thenReturn(Collections.singletonList(tryAsset));
+        when(customUserDetailsService.getCurrentUserId()).thenReturn(1L);
 
         String result = depositWithdrawService.depositMoney(500.0);
 
@@ -45,6 +50,7 @@ public class DepositWithdrawServiceTest {
         Asset tryAsset = new Asset(1L, 1L, "TRY", 10000.0, 10000.0);
 
         when(assetRepository.findByCustomerId(1L)).thenReturn(Collections.singletonList(tryAsset));
+        when(customUserDetailsService.getCurrentUserId()).thenReturn(1L);
 
         String result = depositWithdrawService.withdrawMoney(500.0);
 
