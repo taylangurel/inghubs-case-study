@@ -10,6 +10,6 @@ import java.util.List;
 public interface AssetRepository extends JpaRepository<Asset, Long> {
     List<Asset> findByCustomerId(Long customerId);
 
-    //List<Asset> findByAssetName(String assetName); //TODO:: Bunu dene!
+    //List<Asset> findByAssetName(String assetName);
 }
 

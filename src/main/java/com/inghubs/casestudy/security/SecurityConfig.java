@@ -31,6 +31,9 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * It handles the authentication process by loading user data from the database and checking credentials.
+     */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -39,6 +42,9 @@ public class SecurityConfig {
         return authProvider;
     }
 
+    /**
+     * Configures the security settings for the application using HttpSecurity.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -47,17 +53,17 @@ public class SecurityConfig {
 
                 // Permit access to the specified endpoints
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/register").permitAll() // Allow users to register
-                        .requestMatchers("/h2-console/**").permitAll() // Allow anyone to access /h2-console
+                        .requestMatchers("/api/auth/register").permitAll() // * Allow users to register
+                        .requestMatchers("/h2-console/**").permitAll() // * Allow anyone to access /h2-console
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").hasAnyRole("ADMIN", "CUSTOMER")
                         .anyRequest().authenticated()
                 )
-                .httpBasic(httpBasic -> {})
+                .httpBasic(httpBasic -> {}) // * Enables HTTP Basic authentication, which provides simple username and password-based login.
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // * This is ideal for REST APIs, as it indicates that no server-side session should be maintained.
                 .headers(headers -> headers
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin) // Allow frames from the same origin, This is necessary because the H2 Console is embedded in an iframe, which Spring Security blocks by default.
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin) // Allow frames from the same origin, this is necessary because the H2 Console is embedded in an iframe, which Spring Security blocks by default.
                 );
 
         return http.build();
